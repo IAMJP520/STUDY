@@ -228,13 +228,13 @@ void print_page_tables(process* procs, int proc_count) {
         for (int l1 = 0; l1 < L1_PT_ENTRIES; l1++) {
             if (p->L1_page_table[l1].vflag == PAGE_VALID) {
                 int l1_frame = p->L1_page_table[l1].frame;
-                printf("(L1PT) [PTE %03d] -> [FRAME %03d]\n", l1, l1_frame);
+                printf("(L1PT) [PTE] %03d -> [FRAME] %03d\n", l1, l1_frame);
 
                 pte* l2_table = (pte*)&pas[l1_frame * PAGESIZE];
                 for (int l2 = 0; l2 < L2_PT_ENTRIES; l2++) {
                     if (l2_table[l2].vflag == PAGE_VALID) {
                         int vpn = l1 * L2_PT_ENTRIES + l2;
-                        printf("(L2PT) [PAGE %03d] -> [FRAME %03d] REF=%03d\n", vpn, l2_table[l2].frame, l2_table[l2].ref);
+                        printf("(L2PT) [PAGE] %03d -> [FRAME] %03d REF=%03d\n", vpn, l2_table[l2].frame, l2_table[l2].ref);
                     }
                 }
             }

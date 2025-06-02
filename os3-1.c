@@ -167,13 +167,36 @@ void simulate(process* procs, int proc_count) {
 
 // 각 프로세스의 페이지 테이블 상태와 통계를 출력한다.
 // 페이지 폴트, 총 참조 횟수, 각 페이지별 프레임 매핑 및 참조 횟수를 보여준다.
-void print_page_tables(process *procs, int proc_count) {
+void print_page_tables(process* procs, int proc_count) {
+    int total_faults = 0;
+    int total_refs = 0;
+    int total_frames = 0;
 
+    for (int i = 0; i < proc_count; i++) {
+        process* p = &procs[i];
+        printf("** Process %03d: Allocated Frames=%03d PageFaults/References=%03d/%03d\n",
+            p->pid,  // 프로세스 ID
+            PAGETABLE_FRAMES + p->page_faults,  // 페이지 테이블 + 페이지 폴트 프레임 수
+            p->page_faults,
+            p->ref_len);
 
+        for (int j = 0; j < VAS_PAGES; j++) {
+            pte* entry = &p->page_table[j];
+            if (entry->vflag == PAGE_VALID) {
+                printf("[PAGE] %03d -> [FRAME] %03d REF=%03d\n",
+                    j, entry->frame, entry->ref);
+            }
+        }
 
+        total_faults += p->page_faults;
+        total_refs += p->ref_len;
+        total_frames += PAGETABLE_FRAMES + p->page_faults;
+    }
 
-
+    printf("Total: Allocated Frames=%03d Page Faults/References=%03d/%03d\n",
+        total_frames, total_faults, total_refs);
 }
+
 
 // 메인 함수: 표준 입력에서 프로세스 정보를 읽고, 시뮬레이션을 수행한 뒤 결과를 출력한다.
 // 1) 프로세스 정보 입력
